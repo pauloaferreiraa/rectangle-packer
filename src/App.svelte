@@ -124,7 +124,7 @@
           <rect
             x={MARGIN} y={MARGIN}
             width={outerW} height={outerH}
-            fill="none" stroke={COLOR_BORDER} stroke-width={SW}
+            fill="rgba(220, 38, 38, 0.12)" stroke={COLOR_BORDER} stroke-width={SW}
           />
 
           {#each result.pieces as piece}
@@ -134,7 +134,7 @@
             <rect
               x={px} y={py}
               width={piece.pieceWidth} height={piece.pieceHeight}
-              fill="none" stroke={color} stroke-width={SW}
+              fill="#ffffff" stroke={color} stroke-width={SW}
             />
             {#if piece.pieceWidth >= 1.5 && piece.pieceHeight >= 1.0}
               <text
@@ -404,15 +404,12 @@
 
   /* ── Preview ── */
   .preview-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border-2);
-    border-radius: 4px;
-    padding: 1.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
     margin-bottom: 1.25rem;
-    box-shadow:
-      0 1px 2px rgba(24,18,14,0.04),
-      0 6px 18px rgba(24,18,14,0.07),
-      0 20px 48px rgba(24,18,14,0.05);
+    box-shadow: 0 1px 3px rgba(24,18,14,0.05);
   }
 
   .preview {
