@@ -8,7 +8,7 @@
   let innerW = 7;
   let innerH = 4;
 
-  const MARGIN = 1.0;
+  const MARGIN = 1.5;
   const SW = 0.05;
   const SW_THIN = 0.03;
   const COLOR_BORDER = '#1a1210';
