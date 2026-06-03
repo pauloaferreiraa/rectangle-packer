@@ -1,0 +1,20 @@
+{
+  "appTitle": "Rectangle Packer",
+  "appSubtitle": "Encontre o número máximo de peças idênticas que cabem numa folha",
+  "labelSheet": "Folha",
+  "labelPiece": "Peça",
+  "statPieces": "peças",
+  "statFill": "ocupação",
+  "statWaste": "desperdicio",
+  "statLayout": "disposição",
+  "strategyUniformA": "grelha — orientação normal",
+  "strategyUniformB": "grelha — rodado 90°",
+  "strategyHSplit": "divisão horizontal em duas bandas",
+  "strategyVSplit": "divisão vertical em duas bandas",
+  "downloadBtn": "↓ Exportar SVG para Illustrator",
+  "noFit": "Nenhuma peça cabe — a peça é maior do que a folha em ambas as orientações.",
+  "ariaSheetWidth": "Largura da folha",
+  "ariaSheetHeight": "Altura da folha",
+  "ariaPieceWidth": "Largura da peça",
+  "ariaPieceHeight": "Altura da peça"
+}

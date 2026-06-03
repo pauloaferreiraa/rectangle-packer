@@ -1,0 +1,20 @@
+{
+  "appTitle": "Rectangle Packer",
+  "appSubtitle": "Find the maximum number of identical pieces that fit in a sheet",
+  "labelSheet": "Sheet",
+  "labelPiece": "Piece",
+  "statPieces": "pieces",
+  "statFill": "fill",
+  "statWaste": "waste",
+  "statLayout": "layout",
+  "strategyUniformA": "grid — normal orientation",
+  "strategyUniformB": "grid — rotated 90°",
+  "strategyHSplit": "two-band horizontal split",
+  "strategyVSplit": "two-band vertical split",
+  "downloadBtn": "↓ Download SVG for Illustrator",
+  "noFit": "No pieces fit — the piece is larger than the sheet in both orientations.",
+  "ariaSheetWidth": "Sheet width",
+  "ariaSheetHeight": "Sheet height",
+  "ariaPieceWidth": "Piece width",
+  "ariaPieceHeight": "Piece height"
+}

@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# Vite cache
+.vite/
+
+# local env / config overrides (vite.config.*.local, .env.local, etc.)
+*.local
+
+# macOS
+.DS_Store

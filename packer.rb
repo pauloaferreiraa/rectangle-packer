@@ -230,11 +230,99 @@ class Visualizer
   end
 end
 
+class SvgExporter
+  MARGIN       = 1.0
+  SW           = 0.05   # standard stroke-width in cm
+  SW_THIN      = 0.03
+  COLOR_BORDER = '#000000'
+  COLOR_BAND1  = '#0066CC'
+  COLOR_BAND2  = '#CC0000'
+  COLOR_SPLIT  = '#999999'
+  COLOR_DIM    = '#666666'
+  FONT_PIECE   = 0.5
+  FONT_DIM     = 0.45
+
+  def initialize(outer_width, outer_height, result)
+    @outer_width  = outer_width.to_f
+    @outer_height = outer_height.to_f
+    @result = result
+  end
+
+  def render
+    doc_w = @outer_width  + 2 * MARGIN
+    doc_h = @outer_height + 2 * MARGIN
+
+    out = []
+    out << '<?xml version="1.0" encoding="UTF-8"?>'
+    out << %(<svg xmlns="http://www.w3.org/2000/svg" width="#{f(doc_w)}cm" height="#{f(doc_h)}cm" viewBox="0 0 #{f(doc_w)} #{f(doc_h)}">)
+
+    # Outer boundary
+    out << %(<rect x="#{f(MARGIN)}" y="#{f(MARGIN)}" width="#{f(@outer_width)}" height="#{f(@outer_height)}" fill="none" stroke="#{COLOR_BORDER}" stroke-width="#{SW}"/>)
+
+    # Pieces
+    @result.pieces.each do |piece|
+      color = piece.band == 2 ? COLOR_BAND2 : COLOR_BAND1
+      px = MARGIN + piece.x
+      py = MARGIN + piece.y
+      out << %(<rect x="#{f(px)}" y="#{f(py)}" width="#{f(piece.piece_width)}" height="#{f(piece.piece_height)}" fill="none" stroke="#{color}" stroke-width="#{SW}"/>)
+
+      next unless piece.piece_width >= 1.5 && piece.piece_height >= 1.0
+      label = "#{f(piece.piece_width)}×#{f(piece.piece_height)}"
+      cx = px + piece.piece_width  / 2.0
+      cy = py + piece.piece_height / 2.0
+      out << %(<text x="#{f(cx)}" y="#{f(cy)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="#{FONT_PIECE}" fill="#{color}">#{label}</text>)
+    end
+
+    # Split line
+    if @result.split_axis && @result.split_at
+      if @result.split_axis == :h
+        sy = MARGIN + @result.split_at
+        out << %(<line x1="#{MARGIN}" y1="#{f(sy)}" x2="#{f(MARGIN + @outer_width)}" y2="#{f(sy)}" stroke="#{COLOR_SPLIT}" stroke-width="#{SW_THIN}" stroke-dasharray="0.2,0.15"/>)
+      else
+        sx = MARGIN + @result.split_at
+        out << %(<line x1="#{f(sx)}" y1="#{MARGIN}" x2="#{f(sx)}" y2="#{f(MARGIN + @outer_height)}" stroke="#{COLOR_SPLIT}" stroke-width="#{SW_THIN}" stroke-dasharray="0.2,0.15"/>)
+      end
+    end
+
+    # Width dimension: horizontal line + ticks below the outer rect
+    x1    = MARGIN
+    x2    = MARGIN + @outer_width
+    y_dim = MARGIN + @outer_height + 0.55
+    out << %(<line x1="#{f(x1)}" y1="#{f(y_dim)}" x2="#{f(x2)}" y2="#{f(y_dim)}" stroke="#{COLOR_DIM}" stroke-width="#{SW_THIN}"/>)
+    [x1, x2].each do |tx|
+      out << %(<line x1="#{f(tx)}" y1="#{f(y_dim - 0.2)}" x2="#{f(tx)}" y2="#{f(y_dim + 0.2)}" stroke="#{COLOR_DIM}" stroke-width="#{SW_THIN}"/>)
+    end
+    out << %(<text x="#{f((x1 + x2) / 2.0)}" y="#{f(y_dim + 0.35)}" text-anchor="middle" font-family="sans-serif" font-size="#{FONT_DIM}" fill="#{COLOR_DIM}">#{f(@outer_width)} cm</text>)
+
+    # Height dimension: vertical line + ticks to the right of the outer rect
+    y1    = MARGIN
+    y2    = MARGIN + @outer_height
+    x_dim = MARGIN + @outer_width + 0.55
+    cy    = (y1 + y2) / 2.0
+    out << %(<line x1="#{f(x_dim)}" y1="#{f(y1)}" x2="#{f(x_dim)}" y2="#{f(y2)}" stroke="#{COLOR_DIM}" stroke-width="#{SW_THIN}"/>)
+    [y1, y2].each do |ty|
+      out << %(<line x1="#{f(x_dim - 0.2)}" y1="#{f(ty)}" x2="#{f(x_dim + 0.2)}" y2="#{f(ty)}" stroke="#{COLOR_DIM}" stroke-width="#{SW_THIN}"/>)
+    end
+    out << %(<text x="#{f(x_dim + 0.35)}" y="#{f(cy)}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="#{FONT_DIM}" fill="#{COLOR_DIM}" transform="rotate(90,#{f(x_dim + 0.35)},#{f(cy)})">#{f(@outer_height)} cm</text>)
+
+    out << '</svg>'
+    out.join("\n")
+  end
+
+  private
+
+  def f(val)
+    val.to_i == val ? val.to_i.to_s : val.round(4).to_s
+  end
+end
+
 def prompt_float(label)
   print label
   $stdout.flush
   gets&.chomp.to_f
 end
+
+svg_mode = ARGV.delete('--svg')
 
 outer_width, outer_height, inner_width, inner_height =
   if ARGV.size >= 4
@@ -253,6 +341,15 @@ if [outer_width, outer_height, inner_width, inner_height].any? { |v| v <= 0 }
 end
 
 result = Packer.new(outer_width, outer_height, inner_width, inner_height).pack
+
+if svg_mode
+  if result.count.zero?
+    warn "No pieces fit — the inner piece is larger than the outer in both orientations."
+    exit 1
+  end
+  puts SvgExporter.new(outer_width, outer_height, result).render
+  exit 0
+end
 
 puts
 puts "Outer: #{outer_width}×#{outer_height} cm  |  Inner: #{inner_width}×#{inner_height} cm"
